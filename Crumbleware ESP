@@ -108,10 +108,6 @@ esp.TeamCheck = function(v)
     return true
 end
 
-esp.GetEquippedTool = function(v)
-    return (v.Character:FindFirstChildOfClass("Tool") and tostring(v.Character:FindFirstChildOfClass("Tool"))) or "Hands"
-end
-
 esp.NewPlayer = function(v)
     esp.players[v] = {
         name = esp.NewDrawing("Text", {Color = Color3fromRGB(255, 255, 255), Outline = true, Center = true, Size = 13, Font = 2}),
@@ -130,36 +126,7 @@ esp.NewPlayer = function(v)
     }
 end
 
-function CreateNameTag(Parent, Text)
-    local NameTag = Instance.new("BillboardGui", Parent)
-    NameTag.Size = UDim2.new(1,1, 1,1)
-    NameTag.Name = "ESP"
-    NameTag.AlwaysOnTop = true
-    local NameTag2 = Instance.new("Frame", NameTag)
-    NameTag2.Size = UDim2.new(1,1, 1,1)
-    NameTag2.BackgroundTransparency = 1
-    NameTag2.BorderSizePixel = 0
-    local NameTag3 = Instance.new("TextLabel", NameTag2)
-    NameTag3.Text = Text
-    NameTag3.Size = UDim2.new(1,1, 1,1)
-    NameTag3.BackgroundTransparency = 1
-    NameTag3.BorderSizePixel = 1
-    NameTag3.TextColor3 = Color3.fromRGB(255,255,255)
-end
-
-function CreateHighlight(Model)
-    local Highlight = Instance.new("Highlight")
-        Highlight.Name = "Chams"
-		Highlight.Parent = Model
-		Highlight.OutlineColor = esp.customsettings.chams.outline_color
-		Highlight.FillColor = esp.customsettings.chams.fill_color
-		Highlight.Enabled = true
-		Highlight.FillTransparency = esp.customsettings.chams.fill_transparency
-		Highlight.OutlineTransparency = esp.customsettings.chams.outline_transparency
-end
-
-local esp_Loop
-while task.wait() do
+game:GetService("RunService").RenderStepped:Connect(function()
     for i,v in pairs(esp.players) do
         if i.Character and i.Character:FindFirstChild("Humanoid") and i.Character:FindFirstChild("HumanoidRootPart") and i.Character:FindFirstChild("Head") and i.Character:FindFirstChild("Humanoid").Health > 0 and (esp.maxdist == 0 or (i.Character.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude < esp.maxdist) then
             local hum = i.Character.Humanoid
@@ -400,59 +367,7 @@ while task.wait() do
             v.arrow.Visible = false
         end
     end
-
-    local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
-
-    --[[for _,Folders in pairs(game.Workspace.AiZones:GetChildren()) do
-        for _,Bot in pairs(Folders:GetChildren()) do
-            if Bot and esp.customsettings.enabled and Bot:FindFirstChild("HumanoidRootPart") and (hrp.Position - Bot.HumanoidRootPart.Position).Magnitude <= esp.customsettings.maxdist and Bot.Humanoid.Health >= 1 then
-
-                if esp.customsettings.names.enabled then
-                    if Bot:FindFirstChild("ESP") then
-                        Bot.ESP.StudsOffset = Vector3.new(0,3.5,0)
-                        Bot.ESP.Frame.TextLabel.TextColor3 = esp.customsettings.names.color
-                        Bot.ESP.Frame.TextLabel.BorderColor3 = Color3.new(1,1,1)
-                        Bot.ESP.Frame.TextLabel.TextSize = esp.customsettings.names.size
-                        Bot.ESP.Frame.TextLabel.Font = 3
-                        if not esp.customsettings.distance.enabled then
-                            Bot.ESP.Frame.TextLabel.Text = Bot.Name
-                        elseif esp.customsettings.distance.enabled then
-                            Bot.ESP.Frame.TextLabel.Text = Bot.Name .. " [ " .. math.floor((hrp.Position - Bot.HumanoidRootPart.Position).Magnitude) .. " ]"
-                        end
-                        if esp.customsettings.names.outline then
-                            Bot.ESP.Frame.TextLabel.BorderSizePixel = 10
-                        else
-                            Bot.ESP.Frame.TextLabel.BorderSizePixel = 1
-                        end
-                    else
-                        CreateNameTag(Bot, "Bot")
-                    end
-                else
-                    if Bot:FindFirstChild("ESP") then
-                        Bot.ESP:Destroy()
-                    end
-                end
-
-                if esp.customsettings.chams.enabled then
-                    if not Bot:FindFirstChild("Chams") then
-                        CreateHighlight(Bot)
-                    elseif Bot:FindFirstChild("Chams") then
-                        Bot.Chams:Destroy()
-                        CreateHighlight(Bot)
-                    end
-                else
-                    if Bot:FindFirstChild("Chams") then
-                        Bot.Chams:Destroy()
-                    end
-                end
-            else
-                if Bot:FindFirstChild("ESP") then
-                    Bot.ESP:Destroy()
-                end
-            end
-        end
-    end]]
-end
+end)
 
 local function DrawLine()
     local l = Drawing.new("Line")
@@ -629,24 +544,6 @@ plrs.PlayerRemoving:Connect(function(v)
 
     esp.players[v] = nil
 end)
-
-esp.Unload = function()
-    esp_Loop:Disconnect()
-    esp_Loop = nil
-    
-    for i,v in pairs(esp.players) do
-        for i2, v2 in pairs(v) do
-            if v2 == "cham" then
-                v2:Destroy()
-            else
-                v2:Remove()
-            end
-        end
-    end
-
-    table.clear(esp)
-    esp = nil
-end
 
 getgenv().esp = esp
 return esp
