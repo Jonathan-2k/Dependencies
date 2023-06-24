@@ -55,11 +55,9 @@ local esp = {
         invisible_Color = Color3fromRGB(255, 0, 0),
     },
     customsettings = {
-        enabled = true,
-        maxdist = 4000,
-        names = {enabled = true, outline = true, size = 13, color = Color3fromRGB(255, 255, 255)},
-        distance = {enabled = true, outline = true, color = Color3fromRGB(255, 255, 255)},
-        chams = {enabled = true, fill_transparency = 0, outline_transparency = 0, fill_color = Color3fromRGB(255, 255, 255), outline_color = Color3fromRGB(0, 0, 0)}
+        enabled = false,
+        corpse = {enabled = false, outline = true, size = 13, color = Color3fromRGB(255, 255, 255)},
+        ai = {enabled = false, outline = true, size = 13, color = Color3fromRGB(255, 255, 255)}
     }
 }
 
@@ -528,6 +526,86 @@ for _,v in ipairs(plrs:GetPlayers()) do
         Skeletonesp(v)
     end
 end
+
+function AiEsp(AI)
+    local dropesp = Drawing.new("Text")
+    dropesp.Visible = false
+    dropesp.Center = true
+    dropesp.Outline = true
+    dropesp.Font = 2
+    dropesp.Size = 8
+    local renderstepped
+    renderstepped = game:GetService("RunService").RenderStepped:Connect(function()
+        if esp.customsettings.ai.enabled and AI and (game:GetService("Workspace").AiZones:FindFirstChild(AI.Name, true)) and AI:FindFirstChildOfClass("Humanoid") and AI:FindFirstChildOfClass("MeshPart") then
+            dropesp.Color = esp.customsettings.ai.color
+            local drop_pos, drop_onscreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(AI:FindFirstChildOfClass("MeshPart").Position)
+            if drop_onscreen then
+                dropesp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
+                dropesp.Text = AI.Name.." "..tostring(math.round(AI:FindFirstChildOfClass("Humanoid").Health)).."%"
+                dropesp.Visible = true
+            else 
+                dropesp.Visible = false
+            end
+        else
+            dropesp.Visible = false
+            dropesp:Remove()
+            renderstepped:Disconnect()
+        end
+    end)
+end
+
+for _,drop in next, game:GetService("Workspace").AiZones:GetDescendants() do 
+    if drop:FindFirstChildOfClass("Humanoid") and drop:FindFirstChildOfClass("MeshPart") then
+        AiEsp(drop)
+    end
+end
+game:GetService("Workspace").AiZones.DescendantAdded:Connect(function(drop)
+    wait(0.5)
+    if drop:FindFirstChildOfClass("Humanoid") and drop:FindFirstChildOfClass("MeshPart") then
+        AiEsp(drop)
+    end
+end)
+
+---
+
+function CorpseESP(drop)
+    local dropesp = Drawing.new("Text")
+    dropesp.Visible = false
+    dropesp.Center = true
+    dropesp.Outline = true
+    dropesp.Font = 2
+    dropesp.Size = 8
+    local renderstepped
+    renderstepped = game:GetService("RunService").RenderStepped:Connect(function()
+        if esp.customsettings.corpse.enabled and drop and workspace.DroppedItems:FindFirstChild(drop.Name) and drop:FindFirstChildOfClass("Humanoid") and drop:FindFirstChildOfClass("MeshPart") then
+            dropesp.Color = esp.customsettings.corpse.color
+            local drop_pos, drop_onscreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(drop:FindFirstChildOfClass("MeshPart").Position)
+            if drop_onscreen then
+                dropesp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
+                dropesp.Text = drop.Name.."'s ".."Corpse"
+                dropesp.Visible = true
+            else 
+                dropesp.Visible = false
+            end
+        else
+            dropesp.Visible = false
+            dropesp:Remove()
+            renderstepped:Disconnect()
+        end
+    end)
+end
+
+for _,drop in next, workspace.DroppedItems:GetChildren() do 
+    if drop:FindFirstChildOfClass("Humanoid") then
+        CorpseESP(drop)
+    end
+end
+workspace.DroppedItems.ChildAdded:Connect(function(drop)
+    wait(0.1)
+    if drop:FindFirstChildOfClass("Humanoid") then
+        CorpseESP(drop)
+    end
+end)
 
 plrs.ChildAdded:Connect(function(v)
     esp.NewPlayer(v)
