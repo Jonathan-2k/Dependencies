@@ -645,21 +645,6 @@ workspace.DroppedItems.ChildAdded:Connect(function(drop)
     end
 end)
 
-task.spawn(function()
-    while wait(10) do
-        for _,drop in next, workspace.DroppedItems:GetChildren() do 
-            if drop:FindFirstChildOfClass("Humanoid") then
-                CorpseESP(drop)
-            end
-        end
-        for _,drop in next, game:GetService("Workspace").AiZones:GetDescendants() do 
-            if drop:FindFirstChildOfClass("Humanoid") and drop:FindFirstChildOfClass("MeshPart") then
-                AiEsp(drop)
-            end
-        end
-    end
-end)
-
 plrs.ChildAdded:Connect(function(v)
     esp.NewPlayer(v)
     Skeletonesp(v)
