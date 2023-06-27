@@ -548,23 +548,26 @@ function AiEsp(AI)
         else
             chamcham.Enabled = false
         end
-        if esp.customsettings.ai.enabled and AI and (game:GetService("Workspace").AiZones:FindFirstChild(AI.Name, true)) and AI:FindFirstChildOfClass("Humanoid") and AI:FindFirstChildOfClass("MeshPart") then
-            dropesp.Color = esp.customsettings.ai.color
-            local drop_pos, drop_onscreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(AI:FindFirstChildOfClass("MeshPart").Position)
-            if drop_onscreen then
-                dropesp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
-                if not esp.customsettings.aidistance.enabled and not esp.customsettings.aihealth.enabled then
-                    dropesp.Text = AI.name
-                elseif esp.customsettings.aihealth.enabled then
-                    dropesp.Text = AI.Name.." Health: " .. tostring(math.round(AI:FindFirstChildOfClass("Humanoid").Health))
-                elseif esp.customsettings.aidistance.enabled then
-                    dropesp.Text = AI.Name.." Distance: " .. tostring(math.round((AI:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude))
-                elseif esp.customsettings.aidistance.enabled and esp.customsettings.aihealth.enabled then
-                    dropesp.Text = AI.Name.." Health: " .. tostring(math.round(AI:FindFirstChildOfClass("Humanoid").Health)) .. "|| Distance: " .. tostring(math.round((AI:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude))
+        if AI and (game:GetService("Workspace").AiZones:FindFirstChild(AI.Name, true)) and AI:FindFirstChildOfClass("Humanoid") and AI:FindFirstChildOfClass("MeshPart") then
+            if esp.customsettings.ai.enabled then
+                dropesp.Color = esp.customsettings.ai.color
+                local drop_pos, drop_onscreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(AI:FindFirstChildOfClass("MeshPart").Position)
+                if drop_onscreen then
+                    dropesp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
+                    if not esp.customsettings.aidistance.enabled and not esp.customsettings.aihealth.enabled then
+                        dropesp.Text = AI.name
+                    elseif esp.customsettings.aihealth.enabled then
+                        dropesp.Text = AI.Name.." || Health: " .. tostring(math.round(AI:FindFirstChildOfClass("Humanoid").Health))
+                    elseif esp.customsettings.aidistance.enabled then
+                        dropesp.Text = AI.Name.." || Distance: " .. tostring(math.round((AI:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude))
+                    end
+                    if esp.customsettings.aidistance.enabled and esp.customsettings.aihealth.enabled then
+                        dropesp.Text = AI.Name.." Health: " .. tostring(math.round(AI:FindFirstChildOfClass("Humanoid").Health)) .. "|| Distance: " .. tostring(math.round((AI:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude))
+                    end
+                    dropesp.Visible = true
+                else 
+                    dropesp.Visible = false
                 end
-                dropesp.Visible = true
-            else 
-                dropesp.Visible = false
             end
         else
             dropesp.Visible = false
@@ -605,23 +608,26 @@ function CorpseESP(drop)
         else
             chamcham.Enabled = false
         end
-        if esp.customsettings.corpse.enabled and drop and workspace.DroppedItems:FindFirstChild(drop.Name) and drop:FindFirstChildOfClass("Humanoid") and drop:FindFirstChildOfClass("MeshPart") then
-            dropesp.Color = esp.customsettings.corpse.color
-            local drop_pos, drop_onscreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(drop:FindFirstChildOfClass("MeshPart").Position)
-            if drop_onscreen then
-                dropesp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
-                if not esp.customsettings.corpse.enabled then
-                    dropesp.Text = drop.Name.."'s ".."Corpse"
-                elseif esp.customsettings.corpse.enabled then
-                    dropesp.Text = drop.Name.."'s ".."Corpse" .. " || Distance: " .. tostring(math.round((drop:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude))
+        if drop and workspace.DroppedItems:FindFirstChild(drop.Name) and drop:FindFirstChildOfClass("Humanoid") and drop:FindFirstChildOfClass("MeshPart") then
+            if esp.customsettings.corpse.enabled then
+                dropesp.Color = esp.customsettings.corpse.color
+                local drop_pos, drop_onscreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(drop:FindFirstChildOfClass("MeshPart").Position)
+                if drop_onscreen then
+                    dropesp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
+                    if not esp.customsettings.corpse.enabled then
+                        dropesp.Text = drop.Name.."'s ".."Corpse"
+                    elseif esp.customsettings.corpse.enabled then
+                        dropesp.Text = drop.Name.."'s ".."Corpse" .. " || Distance: " .. tostring(math.round((drop:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude))
+                    end
+                    dropesp.Visible = true
+                else 
+                    dropesp.Visible = false
                 end
-                dropesp.Visible = true
-            else 
-                dropesp.Visible = false
             end
         else
             dropesp.Visible = false
             dropesp:Remove()
+            chamcham:Destroy()
             renderstepped:Disconnect()
         end
     end)
@@ -639,7 +645,7 @@ workspace.DroppedItems.ChildAdded:Connect(function(drop)
     end
 end)
 
-task.spawn(function()
+--[[task.spawn(function()
     while wait(10) do
         for _,drop in next, workspace.DroppedItems:GetChildren() do 
             if drop:FindFirstChildOfClass("Humanoid") then
@@ -652,7 +658,7 @@ task.spawn(function()
             end
         end
     end
-end)
+end)]]
 
 plrs.ChildAdded:Connect(function(v)
     esp.NewPlayer(v)
