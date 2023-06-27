@@ -543,10 +543,10 @@ function AiEsp(AI)
     local renderstepped
     renderstepped = game:GetService("RunService").RenderStepped:Connect(function()
         if esp.customsettings.aichams.enabled then
-            chamcham.Enable = true
+            chamcham.Enabled = true
             chamcham.FillColor = esp.customsettings.aichams.color
         else
-            chamcham.Enable = false
+            chamcham.Enabled = false
         end
         if esp.customsettings.ai.enabled and AI and (game:GetService("Workspace").AiZones:FindFirstChild(AI.Name, true)) and AI:FindFirstChildOfClass("Humanoid") and AI:FindFirstChildOfClass("MeshPart") then
             dropesp.Color = esp.customsettings.ai.color
@@ -600,10 +600,10 @@ function CorpseESP(drop)
     local renderstepped
     renderstepped = game:GetService("RunService").RenderStepped:Connect(function()
         if esp.customsettings.corpsechams.enabled then
-            chamcham.Enable = true
+            chamcham.Enabled = true
             chamcham.FillColor = esp.customsettings.corpsechams.color
         else
-            chamcham.Enable = false
+            chamcham.Enabled = false
         end
         if esp.customsettings.corpse.enabled and drop and workspace.DroppedItems:FindFirstChild(drop.Name) and drop:FindFirstChildOfClass("Humanoid") and drop:FindFirstChildOfClass("MeshPart") then
             dropesp.Color = esp.customsettings.corpse.color
