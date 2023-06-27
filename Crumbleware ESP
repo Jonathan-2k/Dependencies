@@ -57,7 +57,12 @@ local esp = {
     customsettings = {
         enabled = false,
         corpse = {enabled = false, outline = true, size = 13, color = Color3fromRGB(255, 255, 255)},
-        ai = {enabled = false, outline = true, size = 13, color = Color3fromRGB(255, 255, 255)}
+        ai = {enabled = false, outline = true, size = 13, color = Color3fromRGB(255, 255, 255)},
+        corpsechams = {enabled = false, color = Color3fromRGB(255, 255, 255)}
+        aichams = {enabled = false, color = Color3fromRGB(255, 255, 255)}
+        corpsedistance = {enabled = false}
+        aidistance = {enabled = false}
+        aihealth = {enabled = false}
     }
 }
 
@@ -533,15 +538,30 @@ function AiEsp(AI)
     dropesp.Center = true
     dropesp.Outline = true
     dropesp.Font = 2
-    dropesp.Size = 8
+    dropesp.Size = 10
+    local chamcham = esp.NewCham({FillColor = esp.customsettings.aichams.color, OutlineColor = Color3.new(0,0,0), FillTransparency = 0, OutlineTransparency = 1})
     local renderstepped
     renderstepped = game:GetService("RunService").RenderStepped:Connect(function()
+        if esp.customsettings.aichams.enabled then
+            chamcham.Enable = true
+            chamcham.FillColor = esp.customsettings.aichams.color
+        else
+            chamcham.Enable = false
+        end
         if esp.customsettings.ai.enabled and AI and (game:GetService("Workspace").AiZones:FindFirstChild(AI.Name, true)) and AI:FindFirstChildOfClass("Humanoid") and AI:FindFirstChildOfClass("MeshPart") then
             dropesp.Color = esp.customsettings.ai.color
             local drop_pos, drop_onscreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(AI:FindFirstChildOfClass("MeshPart").Position)
             if drop_onscreen then
                 dropesp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
-                dropesp.Text = AI.Name.." "..tostring(math.round(AI:FindFirstChildOfClass("Humanoid").Health)).."%"
+                if not esp.customsettings.aidistance.enabled and not esp.customsettings.aihealth.enabled then
+                    dropesp.Text = AI.name
+                elseif esp.customsettings.aihealth.enabled then
+                    dropesp.Text = AI.Name.." Health: " .. tostring(math.round(AI:FindFirstChildOfClass("Humanoid").Health))
+                elseif esp.customsettings.aidistance.enabled then
+                    dropesp.Text = AI.Name.." Distance: " .. tostring(math.round((AI:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude))
+                elseif esp.customsettings.aidistance.enabled and esp.customsettings.aihealth.enabled then
+                    dropesp.Text = AI.Name.." Health: " .. tostring(math.round(AI:FindFirstChildOfClass("Humanoid").Health)) .. "|| Distance: " .. tostring(math.round((AI:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude))
+                end
                 dropesp.Visible = true
             else 
                 dropesp.Visible = false
@@ -549,6 +569,7 @@ function AiEsp(AI)
         else
             dropesp.Visible = false
             dropesp:Remove()
+            chamcham:Destroy()
             renderstepped:Disconnect()
         end
     end)
@@ -574,15 +595,26 @@ function CorpseESP(drop)
     dropesp.Center = true
     dropesp.Outline = true
     dropesp.Font = 2
-    dropesp.Size = 8
+    dropesp.Size = 10
+    local chamcham = esp.NewCham({FillColor = esp.customsettings.corpsechams.color, OutlineColor = Color3.new(0,0,0), FillTransparency = 0, OutlineTransparency = 1})
     local renderstepped
     renderstepped = game:GetService("RunService").RenderStepped:Connect(function()
+        if esp.customsettings.corpsechams.enabled then
+            chamcham.Enable = true
+            chamcham.FillColor = esp.customsettings.corpsechams.color
+        else
+            chamcham.Enable = false
+        end
         if esp.customsettings.corpse.enabled and drop and workspace.DroppedItems:FindFirstChild(drop.Name) and drop:FindFirstChildOfClass("Humanoid") and drop:FindFirstChildOfClass("MeshPart") then
             dropesp.Color = esp.customsettings.corpse.color
             local drop_pos, drop_onscreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(drop:FindFirstChildOfClass("MeshPart").Position)
             if drop_onscreen then
                 dropesp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
-                dropesp.Text = drop.Name.."'s ".."Corpse"
+                if not esp.customsettings.corpse.enabled then
+                    dropesp.Text = drop.Name.."'s ".."Corpse"
+                elseif esp.customsettings.corpse.enabled then
+                    dropesp.Text = drop.Name.."'s ".."Corpse" .. " || Distance: " .. tostring(math.round((drop:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude))
+                end
                 dropesp.Visible = true
             else 
                 dropesp.Visible = false
