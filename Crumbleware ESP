@@ -645,7 +645,7 @@ workspace.DroppedItems.ChildAdded:Connect(function(drop)
     end
 end)
 
---[[task.spawn(function()
+task.spawn(function()
     while wait(10) do
         for _,drop in next, workspace.DroppedItems:GetChildren() do 
             if drop:FindFirstChildOfClass("Humanoid") then
@@ -658,7 +658,7 @@ end)
             end
         end
     end
-end)]]
+end)
 
 plrs.ChildAdded:Connect(function(v)
     esp.NewPlayer(v)
