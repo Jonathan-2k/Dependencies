@@ -542,7 +542,7 @@ function AddBotEsp(Path)
         else
             chamcham.Enabled = false
         end
-        if Path and (game:GetService("Workspace").AiZones:FindFirstChild(Path.Name, true)) and Path:FindFirstChildOfClass("Humanoid") and Path:FindFirstChildOfClass("MeshPart") then
+        if Path and Path:FindFirstChildOfClass("Humanoid") then
             chamcham.Adornee = Path
             if esp.customsettings.ai.enabled then
                 BotEsp.Color = esp.customsettings.ai.color
@@ -603,7 +603,7 @@ function AddCorpseESP(Corpse)
         else
             chamcham.Enabled = false
         end
-        if Corpse and workspace.DroppedItems:FindFirstChild(Corpse.Name) and Corpse:FindFirstChildOfClass("Humanoid") and Corpse:FindFirstChildOfClass("MeshPart") then
+        if Corpse and Corpse:FindFirstChildOfClass("Humanoid") then
             chamcham.Adornee = Corpse
             if esp.customsettings.corpse.enabled then
                 CorpseEsp.Color = esp.customsettings.corpse.color
