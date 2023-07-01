@@ -85,6 +85,101 @@ esp.NewCham = function(properties)
     return newCham
 end
 
+function AddCorpseESP(Corpse)
+    local CorpseEsp = Drawing.new("Text")
+    CorpseEsp.Visible = false
+    CorpseEsp.Center = true
+    CorpseEsp.Outline = true
+    CorpseEsp.Font = 2
+    CorpseEsp.Size = 10
+    local part = Instance.new("Part")
+    part.Parent = Corpse
+    part.Name = "esp"
+    local chamcham = esp.NewCham({FillColor = esp.customsettings.corpsechams.color, OutlineColor = Color3.new(0,0,0), FillTransparency = 0, OutlineTransparency = 1})
+    local renderstepped
+    renderstepped = game:GetService("RunService").RenderStepped:Connect(function()
+        if esp.customsettings.corpsechams.enabled then
+            chamcham.Enabled = true
+            chamcham.FillColor = esp.customsettings.corpsechams.color
+        else
+            chamcham.Enabled = false
+        end
+        if Corpse and Corpse:FindFirstChildOfClass("Humanoid") and Corpse:FindFirstChildOfClass("MeshPart") then
+            chamcham.Adornee = Corpse
+            if esp.customsettings.corpse.enabled then
+                CorpseEsp.Color = esp.customsettings.corpse.color
+                local drop_pos, drop_onscreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(Corpse:FindFirstChildOfClass("MeshPart").Position)
+                if drop_onscreen then
+                    CorpseEsp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
+                    if not esp.customsettings.corpse.enabled then
+                        CorpseEsp.Text = Corpse.Name.."'s ".."Corpse"
+                    elseif esp.customsettings.corpse.enabled then
+                        CorpseEsp.Text = Corpse.Name.."'s ".."Corpse" .. " || Distance: " .. tostring(math.round((Corpse:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude) / 3)
+                    end
+                    CorpseEsp.Visible = true
+                else 
+                    CorpseEsp.Visible = false
+                end
+            end
+        else
+            CorpseEsp.Visible = false
+            CorpseEsp:Remove()
+            chamcham:Destroy()
+            renderstepped:Disconnect()
+        end
+    end)
+end
+
+function AddBotEsp(Path)
+    local BotEsp = Drawing.new("Text")
+    BotEsp.Visible = false
+    BotEsp.Center = true
+    BotEsp.Outline = true
+    BotEsp.Font = 2
+    BotEsp.Size = 10
+    local part = Instance.new("Part")
+    part.Parent = Corpse
+    part.Name = "esp"
+    local chamcham = esp.NewCham({FillColor = esp.customsettings.aichams.color, OutlineColor = Color3.new(0,0,0), FillTransparency = 0, OutlineTransparency = 1})
+    local renderstepped
+    renderstepped = game:GetService("RunService").RenderStepped:Connect(function()
+        if esp.customsettings.aichams.enabled then
+            chamcham.Enabled = true
+            chamcham.FillColor = esp.customsettings.aichams.color
+        else
+            chamcham.Enabled = false
+        end
+        if Path and Path:FindFirstChildOfClass("Humanoid") and Path:FindFirstChildOfClass("MeshPart") then
+            chamcham.Adornee = Path
+            if esp.customsettings.ai.enabled then
+                BotEsp.Color = esp.customsettings.ai.color
+                local drop_pos, drop_onscreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(Path:FindFirstChildOfClass("MeshPart").Position)
+                if drop_onscreen then
+                    BotEsp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
+                    if not esp.customsettings.aidistance.enabled and not esp.customsettings.aihealth.enabled then
+                        BotEsp.Text = Path.name
+                    elseif esp.customsettings.aihealth.enabled then
+                        BotEsp.Text = Path.Name.." || Health: " .. tostring(math.round(Path:FindFirstChildOfClass("Humanoid").Health))
+                    elseif esp.customsettings.aidistance.enabled then
+                        BotEsp.Text = Path.Name.." || Distance: " .. tostring(math.round((Path:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude) / 3)
+                    end
+                    if esp.customsettings.aidistance.enabled and esp.customsettings.aihealth.enabled then
+                        BotEsp.Text = Path.Name.." Health: " .. tostring(math.round(Path:FindFirstChildOfClass("Humanoid").Health)) .. "|| Distance: " .. tostring(math.round((Path:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude) / 3)
+                    end
+                    BotEsp.Visible = true
+                else 
+                    BotEsp.Visible = false
+                end
+            end
+        else
+            BotEsp.Visible = false
+            BotEsp:Remove()
+            chamcham:Destroy()
+            renderstepped:Disconnect()
+        end
+    end)
+end
+
 esp.WallCheck = function(v)
     local ray = Ray.new(camera.CFrame.p, (v.Position - camera.CFrame.p).Unit * 300)
     local part, position = game:GetService("Workspace"):FindPartOnRayWithIgnoreList(ray, {plr.Character, camera}, false, true)
@@ -369,6 +464,18 @@ game:GetService("RunService").RenderStepped:Connect(function()
             v.arrow.Visible = false
         end
     end
+
+    for i,v in pairs(game:GetService("Workspace").AiZones:GetDescendants()) do
+        if v:FindFirstChild("Humanoid") and not v:FindFirstChild("esp") then
+            AddBotEsp(v)
+        end
+    end
+    
+    for _,v in next, workspace.DroppedItems:GetChildren() do 
+        if v:FindFirstChildOfClass("Humanoid") and not v:FindFirstChild("esp") then
+            AddCorpseESP(v)
+        end
+    end
 end)
 
 local function DrawLine()
@@ -524,127 +631,6 @@ local function Skeletonesp(plr)
         coroutine.wrap(UpdaterR15)()
     end)
 end
-
-task.spawn(function()
-repeat wait() until game:GetService("Workspace"):FindFirstChild("AiZones") and workspace:FindFirstChild("DroppedItems")
-
---Bot Esp
-function AddBotEsp(Path)
-    local BotEsp = Drawing.new("Text")
-    BotEsp.Visible = false
-    BotEsp.Center = true
-    BotEsp.Outline = true
-    BotEsp.Font = 2
-    BotEsp.Size = 10
-    local chamcham = esp.NewCham({FillColor = esp.customsettings.aichams.color, OutlineColor = Color3.new(0,0,0), FillTransparency = 0, OutlineTransparency = 1})
-    local renderstepped
-    renderstepped = game:GetService("RunService").RenderStepped:Connect(function()
-        if esp.customsettings.aichams.enabled then
-            chamcham.Enabled = true
-            chamcham.FillColor = esp.customsettings.aichams.color
-        else
-            chamcham.Enabled = false
-        end
-        if Path and Path:FindFirstChildOfClass("Humanoid") and Path:FindFirstChildOfClass("MeshPart") then
-            chamcham.Adornee = Path
-            if esp.customsettings.ai.enabled then
-                BotEsp.Color = esp.customsettings.ai.color
-                local drop_pos, drop_onscreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(Path:FindFirstChildOfClass("MeshPart").Position)
-                if drop_onscreen then
-                    BotEsp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
-                    if not esp.customsettings.aidistance.enabled and not esp.customsettings.aihealth.enabled then
-                        BotEsp.Text = Path.name
-                    elseif esp.customsettings.aihealth.enabled then
-                        BotEsp.Text = Path.Name.." || Health: " .. tostring(math.round(Path:FindFirstChildOfClass("Humanoid").Health))
-                    elseif esp.customsettings.aidistance.enabled then
-                        BotEsp.Text = Path.Name.." || Distance: " .. tostring(math.round((Path:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude) / 3)
-                    end
-                    if esp.customsettings.aidistance.enabled and esp.customsettings.aihealth.enabled then
-                        BotEsp.Text = Path.Name.." Health: " .. tostring(math.round(Path:FindFirstChildOfClass("Humanoid").Health)) .. "|| Distance: " .. tostring(math.round((Path:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude) / 3)
-                    end
-                    BotEsp.Visible = true
-                else 
-                    BotEsp.Visible = false
-                end
-            end
-        else
-            BotEsp.Visible = false
-            BotEsp:Remove()
-            chamcham:Destroy()
-            renderstepped:Disconnect()
-        end
-    end)
-end
-
-for i,v in pairs(game:GetService("Workspace").AiZones:GetDescendants()) do
-    if v:FindFirstChild("Humanoid") then
-        AddBotEsp(v)
-    end
-end
-
-game:GetService("Workspace").AiZones.DescendantAdded:Connect(function(Child)
-    if Child:FindFirstChild("Humanoid") then
-        AddBotEsp(Child)
-    end
-end)
-
---Corpse Esp
-
-function AddCorpseESP(Corpse)
-    local CorpseEsp = Drawing.new("Text")
-    CorpseEsp.Visible = false
-    CorpseEsp.Center = true
-    CorpseEsp.Outline = true
-    CorpseEsp.Font = 2
-    CorpseEsp.Size = 10
-    local chamcham = esp.NewCham({FillColor = esp.customsettings.corpsechams.color, OutlineColor = Color3.new(0,0,0), FillTransparency = 0, OutlineTransparency = 1})
-    local renderstepped
-    renderstepped = game:GetService("RunService").RenderStepped:Connect(function()
-        if esp.customsettings.corpsechams.enabled then
-            chamcham.Enabled = true
-            chamcham.FillColor = esp.customsettings.corpsechams.color
-        else
-            chamcham.Enabled = false
-        end
-        if Corpse and Corpse:FindFirstChildOfClass("Humanoid") and Corpse:FindFirstChildOfClass("MeshPart") then
-            chamcham.Adornee = Corpse
-            if esp.customsettings.corpse.enabled then
-                CorpseEsp.Color = esp.customsettings.corpse.color
-                local drop_pos, drop_onscreen = game:GetService("Workspace").CurrentCamera:WorldToViewportPoint(Corpse:FindFirstChildOfClass("MeshPart").Position)
-                if drop_onscreen then
-                    CorpseEsp.Position = Vector2.new(drop_pos.X, drop_pos.Y)
-                    if not esp.customsettings.corpse.enabled then
-                        CorpseEsp.Text = Corpse.Name.."'s ".."Corpse"
-                    elseif esp.customsettings.corpse.enabled then
-                        CorpseEsp.Text = Corpse.Name.."'s ".."Corpse" .. " || Distance: " .. tostring(math.round((Corpse:FindFirstChildOfClass("MeshPart").Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude) / 3)
-                    end
-                    CorpseEsp.Visible = true
-                else 
-                    CorpseEsp.Visible = false
-                end
-            end
-        else
-            CorpseEsp.Visible = false
-            CorpseEsp:Remove()
-            chamcham:Destroy()
-            renderstepped:Disconnect()
-        end
-    end)
-end
-
-for _,v in next, workspace.DroppedItems:GetChildren() do 
-    if v:FindFirstChildOfClass("Humanoid") then
-        AddCorpseESP(v)
-    end
-end
-
-workspace.DroppedItems.DescendantAdded:Connect(function(Child)
-    if Child:FindFirstChildOfClass("Humanoid") then
-        AddCorpseESP(Child)
-    end
-end)
-
-end)
 
 for _,v in ipairs(plrs:GetPlayers()) do
     if v ~= plr then
