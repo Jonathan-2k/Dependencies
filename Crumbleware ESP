@@ -525,6 +525,9 @@ local function Skeletonesp(plr)
     end)
 end
 
+task.spawn(function()
+repeat wait() until game:GetService("Workspace"):FindFirstChild("AiZones") and workspace:FindFirstChild("DroppedItems")
+
 --Bot Esp
 function AddBotEsp(Path)
     local BotEsp = Drawing.new("Text")
@@ -639,6 +642,8 @@ workspace.DroppedItems.DescendantAdded:Connect(function(Child)
     if Child:FindFirstChildOfClass("Humanoid") then
         AddCorpseESP(Child)
     end
+end)
+
 end)
 
 for _,v in ipairs(plrs:GetPlayers()) do
